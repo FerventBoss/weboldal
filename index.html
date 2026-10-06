@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Git Kisokos – verziókezelés csapatban</title>
+  <meta name="description" content="Git és GitHub a gyakorlatban: munkafolyamat, kereshető parancslista és kvíz két emberes csapatmunkához.">
+  <meta name="theme-color" content="#edf0f4">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    /* Téma beállítása még az első kirajzolás előtt, hogy ne villanjon az oldal */
+    (function () {
+      var root = document.documentElement;
+      root.classList.add('js');
+      var theme = null;
+      try { theme = localStorage.getItem('gitkisokos-theme'); } catch (e) {}
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      root.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <script src="js/script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#tartalom">Ugrás a tartalomra</a>
+
+  <header class="site-header">
+    <div class="container header__inner">
+      <a class="brand" href="#top">
+        <svg class="logo" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true" focusable="false">
+          <path class="logo__main" d="M10 8v16" />
+          <path class="logo__feat" d="M10 8c0 6 12 2 12 8s-12 2-12 8" />
+          <circle class="logo__dot logo__dot--main" cx="10" cy="8" r="3.5" />
+          <circle class="logo__dot logo__dot--feat" cx="22" cy="16" r="3.5" />
+          <circle class="logo__dot logo__dot--main" cx="10" cy="24" r="3.5" />
+        </svg>
+        <span>Git Kisokos</span>
+      </a>
+
+      <nav id="site-nav" class="site-nav" aria-label="Fő navigáció">
+        <ul>
+          <li><a href="#git">Git vs. GitHub</a></li>
+          <li><a href="#folyamat">Munkafolyamat</a></li>
+          <li><a href="#parancsok">Parancsok</a></li>
+          <li><a href="#kviz">Kvíz</a></li>
+          <li><a href="#csapat">Csapat</a></li>
+        </ul>
+      </nav>
+
+      <button class="icon-btn theme-toggle" type="button" aria-label="Váltás sötét módra">
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z" />
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" />
+        </svg>
+      </button>
+
+      <button class="icon-btn nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menü megnyitása">
+        <svg class="icon-menu" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+        <svg class="icon-close" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="tartalom">
+    <!-- ===================== Hero: interaktív commit-előzmény ===================== -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="container hero__grid">
+        <div class="hero__text">
+          <h1 id="hero-title">Git Kisokos</h1>
+          <p class="lead">Verziókezelés két emberes csapatmunkához: commit, push, pull, ágak és pull request, egy valódi projekt előzményein bemutatva.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#parancsok">Parancsok böngészése</a>
+            <a class="btn btn--ghost" href="#kviz">Kvíz kitöltése</a>
+          </div>
+        </div>
+
+        <figure class="graph-panel">
+          <figcaption class="graph-panel__bar">
+            <code>git log --graph --all</code>
+            <span>Válassz egy commitot, vagy lépkedj a nyílbillentyűkkel.</span>
+          </figcaption>
+          <div class="graph" id="graph"></div>
+          <div class="commit" id="commit-detail"></div>
+          <noscript>
+            <p class="commit">Az interaktív előzményhez engedélyezd a JavaScriptet.</p>
+          </noscript>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================== Git vs. GitHub ===================== -->
+    <section class="section section--alt" id="git" aria-labelledby="git-title">
+      <div class="container">
+        <h2 id="git-title">Git vs. GitHub</h2>
+        <p class="section__lead">A két nevet gyakran keverik, pedig két külön dologról van szó: az egyik a gépeden futó program, a másik egy online szolgáltatás, ami erre épül.</p>
+        <div class="table-wrap table-wrap--stack">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Szempont</th>
+                <th scope="col">Git</th>
+                <th scope="col">GitHub</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Mi ez?</th>
+                <td data-label="Git">Elosztott verziókezelő program</td>
+                <td data-label="GitHub">Webes tárhely és együttműködési platform Git-repókhoz</td>
+              </tr>
+              <tr>
+                <th scope="row">Hol fut?</th>
+                <td data-label="Git">A saját gépeden, internet nélkül is</td>
+                <td data-label="GitHub">A felhőben, böngészőből és a Git parancsain keresztül érhető el</td>
+              </tr>
+              <tr>
+                <th scope="row">Mit tárol?</th>
+                <td data-label="Git">A projekt teljes előzményét a <code>.git</code> mappában</td>
+                <td data-label="GitHub">A repó távoli (remote) másolatát, amit a csapat közösen használ</td>
+              </tr>
+              <tr>
+                <th scope="row">Mire jó?</th>
+                <td data-label="Git">Commitok, ágak, beolvasztás, korábbi állapot visszaállítása</td>
+                <td data-label="GitHub">Megosztás, pull request, code review, issue-k, GitHub Pages</td>
+              </tr>
+              <tr>
+                <th scope="row">Eredete</th>
+                <td data-label="Git">Linus Torvalds, 2005</td>
+                <td data-label="GitHub">2008 óta működik, 2018 óta a Microsoft tulajdona</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Munkafolyamat ===================== -->
+    <section class="section" id="folyamat" aria-labelledby="folyamat-title">
+      <div class="container">
+        <h2 id="folyamat-title">A munkafolyamat</h2>
+        <p class="section__lead">Egy módosítás négy helyen halad át, mire a csapattársad is látja. Az első három a saját gépeden van és internet nélkül is működik; a GitHub a közös, távoli repó.</p>
+
+        <div class="flow">
+          <div class="flow__zone">
+            <h3>Munkakönyvtár</h3>
+            <p>A projektmappa a gépeden. Itt szerkeszted a fájlokat.</p>
+          </div>
+          <div class="flow__step">
+            <svg class="flow__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M14 6l6 6-6 6" /></svg>
+            <code>git add</code>
+          </div>
+          <div class="flow__zone">
+            <h3>Staging terület</h3>
+            <p>A kijelölt változások, amelyek a következő commitba kerülnek.</p>
+          </div>
+          <div class="flow__step">
+            <svg class="flow__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M14 6l6 6-6 6" /></svg>
+            <code>git commit</code>
+          </div>
+          <div class="flow__zone">
+            <h3>Helyi repó</h3>
+            <p>A commitok a <code>.git</code> mappában. Minden mentett állapot visszakereshető.</p>
+          </div>
+          <div class="flow__step">
+            <svg class="flow__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M14 6l6 6-6 6" /></svg>
+            <code>git push</code>
+          </div>
+          <div class="flow__zone flow__zone--remote">
+            <h3>GitHub</h3>
+            <p>A közös távoli repó (<code>origin</code>). Innen kapja meg a munkádat a csapattársad.</p>
+          </div>
+          <div class="flow__back">
+            <svg class="flow__arrow flow__arrow--back" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M14 6l6 6-6 6" /></svg>
+            <code>git pull</code>
+            <p>Letölti a GitHubon lévő új commitokat, és beolvasztja őket a helyi ágadba és a munkakönyvtáradba (<code>fetch</code> + <code>merge</code>).</p>
+          </div>
+        </div>
+
+        <h3 class="subhead">Ugyanez VS Code-ban</h3>
+        <div class="table-wrap table-wrap--stack">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Parancs</th>
+                <th scope="col">VS Code – Source Control nézet (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><code>git add</code></th>
+                <td data-label="VS Code">A fájl melletti <strong>+</strong> (Stage Changes), vagy a Changes sor melletti <strong>+</strong> az összes fájlhoz.</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>git commit</code></th>
+                <td data-label="VS Code">Üzenet a szövegmezőbe, majd <strong>Commit</strong>.</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>git pull</code> + <code>git push</code></th>
+                <td data-label="VS Code"><strong>Sync Changes</strong> gomb vagy az állapotsor szinkron ikonja: előbb lehúz, utána feltölt.</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>git switch -c</code></th>
+                <td data-label="VS Code">Bal alsó sarokban az ág nevére kattintva: <strong>Create new branch…</strong></td>
+              </tr>
+              <tr>
+                <th scope="row"><code>git log --graph</code></th>
+                <td data-label="VS Code">A Source Control nézet <strong>Graph</strong> része.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Parancsok ===================== -->
+    <section class="section section--alt" id="parancsok" aria-labelledby="parancsok-title">
+      <div class="container">
+        <h2 id="parancsok-title">Parancsok</h2>
+        <p class="section__lead">Keress parancsra vagy feladatra (például „feltöltés”, „ág”, „visszavonás”), és másold ki egy kattintással.</p>
+
+        <div class="cmd-tools">
+          <div class="search">
+            <label for="cmd-search" class="sr-only">Keresés a parancsok között</label>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></svg>
+            <input id="cmd-search" type="search" placeholder="Keresés… (gyorsbillentyű: /)" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="chips" role="group" aria-label="Szűrés kategória szerint">
+            <button type="button" class="chip" data-filter="all" aria-pressed="true">Mind</button>
+            <button type="button" class="chip" data-filter="beallitas" aria-pressed="false">Beállítás</button>
+            <button type="button" class="chip" data-filter="alapok" aria-pressed="false">Alapok</button>
+            <button type="button" class="chip" data-filter="agak" aria-pressed="false">Ágak</button>
+            <button type="button" class="chip" data-filter="tavoli" aria-pressed="false">Távoli repó</button>
+            <button type="button" class="chip" data-filter="visszavonas" aria-pressed="false">Visszavonás</button>
+          </div>
+        </div>
+
+        <p class="cmd-count" id="cmd-count" aria-live="polite"></p>
+        <ul class="cmd-list" id="cmd-list"></ul>
+        <p class="cmd-empty" id="cmd-empty" hidden></p>
+        <noscript><p>A kereshető parancslistához engedélyezd a JavaScriptet.</p></noscript>
+      </div>
+    </section>
+
+    <!-- ===================== Kvíz ===================== -->
+    <section class="section" id="kviz" aria-labelledby="kviz-title">
+      <div class="container">
+        <h2 id="kviz-title">Kvíz</h2>
+        <p class="section__lead">Hat kérdés a munkafolyamatról. Minden válasz után megkapod a magyarázatot is.</p>
+        <div class="quiz" id="quiz"></div>
+        <noscript><p>A kvízhez engedélyezd a JavaScriptet.</p></noscript>
+      </div>
+    </section>
+
+    <!-- ===================== Csapat ===================== -->
+    <section class="section section--alt" id="csapat" aria-labelledby="csapat-title">
+      <div class="container">
+        <h2 id="csapat-title">Csapat</h2>
+        <p class="section__lead">A projektet ketten fejlesztettük egy közös GitHub-repóban, külön ágakon és pull requestekkel.</p>
+        <ul class="team">
+          <li class="member" data-member="a">
+            <span class="member__avatar" aria-hidden="true">N</span>
+            <div>
+              <p class="member__name">Neved</p>
+              <p class="member__role">Oldalváz, navigáció, sötét mód, pull requestek áttekintése</p>
+              <a href="https://github.com/felhasznalonev1">@felhasznalonev1</a>
+            </div>
+          </li>
+          <li class="member" data-member="b">
+            <span class="member__avatar" aria-hidden="true">C</span>
+            <div>
+              <p class="member__name">Csapattársad neve</p>
+              <p class="member__role">Kvíz, parancslista, dokumentáció (README)</p>
+              <a href="https://github.com/felhasznalonev2">@felhasznalonev2</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© <span id="year">2026</span> Git Kisokos. Szakmai projekt: vanilla HTML, CSS és JavaScript, Git-tel verziókezelve.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
